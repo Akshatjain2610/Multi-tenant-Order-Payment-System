@@ -62,4 +62,20 @@ export class OrdersService {
             },
         }));
     }
+
+    async findById(tenantId: string, orderId: number): Promise<OrderResponseDto[]> {
+        return await this.orderRepo.find({
+            where: { id: orderId, tenantId },
+            relations: ['user'],
+        });
+    }
+
+    async findEntityById(
+        tenantId: string,
+        orderId: number,
+    ): Promise<Order | null> {
+        return this.orderRepo.findOne({
+            where: { id: orderId, tenantId },
+        });
+    }
 }
