@@ -6,7 +6,7 @@ import { QueuesModule } from 'src/queues/queues.module';
 import { OutboxPublisher } from './outbox.publisher';
 import { ScheduleModule } from '@nestjs/schedule';
 import { OutboxProcessor } from './outbox.processor';
-import { WorkersModule } from './workers/workers.module';
+import { WorkersModule } from 'src/workers/workers.module';
 
 @Module({
   imports: [
