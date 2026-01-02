@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, RequestMethod } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UsersModule } from './users/users.module';
@@ -8,6 +8,8 @@ import { OrdersModule } from './orders/orders.module';
 import { PaymentsModule } from './payments/payments.module';
 import { OutboxModule } from './outbox/outbox.module';
 import { QueuesModule } from './queues/queues.module';
+import { TenantsModule } from './tenants/tenants.module';
+import { TenantMiddleware } from './common/middleware/tenant.middleware';
 
 @Module({
   imports: [
@@ -26,9 +28,19 @@ import { QueuesModule } from './queues/queues.module';
     OrdersModule,
     PaymentsModule,
     OutboxModule,
-    QueuesModule
+    QueuesModule,
+    TenantsModule
   ],
   // controllers: [AppController],
   // providers: [AppService],
 })
-export class AppModule { }
+export class AppModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(TenantMiddleware)
+      .exclude(
+        { path: 'tenants', method: RequestMethod.POST },
+      )
+      .forRoutes('*');
+  }
+}

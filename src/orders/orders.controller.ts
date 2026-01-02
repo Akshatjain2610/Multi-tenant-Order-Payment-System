@@ -3,7 +3,6 @@ import {
   Post,
   Get,
   Body,
-  Headers,
   UseGuards,
   Request,
 } from '@nestjs/common';
@@ -21,23 +20,22 @@ import { ApiBearerAuth, ApiHeader, ApiTags } from '@nestjs/swagger';
 @UseGuards(JwtAuthGuard)
 @Controller('orders')
 export class OrdersController {
-  constructor(private readonly ordersService: OrdersService) {}
+  constructor(private readonly ordersService: OrdersService) { }
 
   @Post()
   create(
-    @Headers('x-tenant-id') tenantId: string,
     @Request() req,
     @Body() dto: CreateOrderDto,
   ) {
     return this.ordersService.create(
-      tenantId,
+      req.tenant.key,
       req.user.userId,
       dto,
     );
   }
 
   @Get()
-  findAll(@Headers('x-tenant-id') tenantId: string) {
-    return this.ordersService.findAll(tenantId);
+  findAll(@Request() req) {
+    return this.ordersService.findAll(req.tenant.key);
   }
 }
