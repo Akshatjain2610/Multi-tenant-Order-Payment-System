@@ -10,6 +10,10 @@ import { OutboxModule } from './outbox/outbox.module';
 import { QueuesModule } from './queues/queues.module';
 import { TenantsModule } from './tenants/tenants.module';
 import { TenantMiddleware } from './common/middleware/tenant.middleware';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { APP_GUARD } from '@nestjs/core';
+import { TenantThrottlerGuard } from './common/guards/tenant-throttler.guard';
+import { DebugController } from './debug/debug.controller';
 
 @Module({
   imports: [
@@ -23,6 +27,12 @@ import { TenantMiddleware } from './common/middleware/tenant.middleware';
       autoLoadEntities: true,
       synchronize: true, // ⚠️ dev only
     }),
+    ThrottlerModule.forRoot({
+      throttlers: [{
+        ttl: 60 * 1000,
+        limit: 100
+      }]
+    }),
     UsersModule,
     AuthModule,
     OrdersModule,
@@ -32,7 +42,11 @@ import { TenantMiddleware } from './common/middleware/tenant.middleware';
     TenantsModule
   ],
   // controllers: [AppController],
-  // providers: [AppService],
+  providers: [{
+    provide: APP_GUARD,
+    useClass: TenantThrottlerGuard
+  }],
+  controllers: [DebugController],
 })
 export class AppModule {
   configure(consumer: MiddlewareConsumer) {

@@ -11,9 +11,13 @@ export class TenantMiddleware implements NestMiddleware {
   constructor(private readonly tenantsService: TenantsService) {}
 
   async use(req: Request, _: Response, next: NextFunction) {
+    // allow auth routes without tenant
+    if (req.path.startsWith('/auth')) {
+      return next();
+    }
+
     const tenantKey = req.headers['x-tenant-id'] as string;
-    console.log("🚀 ~ TenantMiddleware ~ use ~ tenantKey:", tenantKey)
-    
+
     if (!tenantKey) {
       throw new ForbiddenException('X-Tenant-Id header missing');
     }
@@ -24,9 +28,7 @@ export class TenantMiddleware implements NestMiddleware {
       throw new ForbiddenException('Invalid tenant');
     }
 
-    // attach tenant to request
     (req as any).tenant = tenant;
-
     next();
   }
 }
