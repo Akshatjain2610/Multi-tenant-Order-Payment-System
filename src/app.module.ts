@@ -27,12 +27,21 @@ import { DebugController } from './debug/debug.controller';
       autoLoadEntities: true,
       synchronize: true, // ⚠️ dev only
     }),
-    ThrottlerModule.forRoot({
-      throttlers: [{
-        ttl: 60 * 1000,
-        limit: 100
-      }]
-    }),
+    ThrottlerModule.forRoot([{
+      name: 'short',
+      ttl: 1000,
+      limit: 3,
+    },
+    {
+      name: 'medium',
+      ttl: 10000,
+      limit: 20
+    },
+    {
+      name: 'long',
+      ttl: 60000,
+      limit: 100
+    }]),
     UsersModule,
     AuthModule,
     OrdersModule,
